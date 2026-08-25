@@ -12,11 +12,11 @@ class AdminController {
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
             <title>Relink - لوحة التحكم الشجرية</title>
-            <link rel="stylesheet" href="/assets/css/style.css">
+            <link rel="stylesheet" href="assets/css/style.css">
             <link rel="preconnect" href="https://fonts.googleapis.com">
             <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
             <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
-            <script src="/assets/js/qrcode.min.js"></script>
+            <script src="assets/js/qrcode.min.js"></script>
         </head>
         <body class="dark-theme">
             <div id="app">
@@ -225,8 +225,8 @@ class AdminController {
                     </div>
                 <?php endif; ?>
             </div>
-            <script src="/assets/js/modal.js"></script>
-            <script src="/assets/js/app.js"></script>
+            <script src="assets/js/modal.js"></script>
+            <script src="assets/js/app.js"></script>
         </body>
         </html>
         <?php
