@@ -201,25 +201,20 @@ class AdminController {
 
                     <!-- Analytics Modal -->
                     <div id="modal-analytics" class="modal-backdrop">
-                        <div class="modal-card glass-panel">
-                            <h3>سجل إحصائيات الضغطات</h3>
-                            <p id="analytics-link-title" class="sub-text"></p>
-                            <div id="analytics-stats-summary" class="analytics-summary"></div>
-                            <div class="table-scroll">
-                                <table class="data-table">
-                                    <thead>
-                                        <tr>
-                                            <th>التاريخ والوقت</th>
-                                            <th>عنوان IP</th>
-                                            <th>المتصفح والجهاز</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="analytics-table-body">
-                                        <tr><td colspan="3">لا توجد زيارات مسجلة بعد</td></tr>
-                                    </tbody>
-                                </table>
+                        <div class="modal-card glass-panel text-center">
+                            <h3>إحصائيات الدرس</h3>
+                            <p id="analytics-link-title" class="sub-text" style="color: var(--accent); font-weight: bold; font-size: 16px; margin-top: 4px;"></p>
+                            
+                            <div class="analytics-card-box" style="background: rgba(15, 23, 42, 0.7); padding: 26px; border-radius: 16px; margin: 20px 0; border: 1px solid var(--border-color);">
+                                <div style="font-size: 46px; color: var(--success); font-weight: 800; line-height: 1;" id="analytics-total-count">0</div>
+                                <div style="font-size: 13px; color: var(--text-muted); margin-top: 8px;">إجمالي عدد الضغطات والزيارات</div>
+                                <div style="height: 1px; background: var(--border-color); margin: 18px 0;"></div>
+                                <div style="font-size: 13px; color: var(--text-main);">
+                                    🕒 آخر زيارة: <span id="analytics-last-access" style="color: var(--accent); font-weight: bold;">لم يزار بعد</span>
+                                </div>
                             </div>
-                            <div class="modal-actions">
+
+                            <div class="modal-actions justify-center">
                                 <button class="btn btn-secondary modal-close">إغلاق</button>
                             </div>
                         </div>

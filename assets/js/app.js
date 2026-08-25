@@ -417,29 +417,10 @@ class RelinkApp {
         ModalManager.open('modal-qr');
     }
 
-    async showAnalyticsModal(link) {
+    showAnalyticsModal(link) {
         document.getElementById('analytics-link-title').innerText = link.title;
-        const summary = document.getElementById('analytics-stats-summary');
-        const tbody = document.getElementById('analytics-table-body');
-
-        summary.innerHTML = `إجمالي عدد الزيارات: <strong>${link.click_count || 0}</strong> ضغطة | آخر زيارة: <strong>${link.last_accessed_at || 'لم يزار بعد'}</strong>`;
-
-        try {
-            const res = await fetch(`/api/links/analytics/${link.id}`).then(r => r.json());
-            if (res.success && res.logs && res.logs.length > 0) {
-                tbody.innerHTML = res.logs.map(log => `
-                    <tr>
-                        <td>${log.clicked_at}</td>
-                        <td><code>${log.ip_address}</code></td>
-                        <td>${log.user_agent}</td>
-                    </tr>
-                `).join('');
-            } else {
-                tbody.innerHTML = `<tr><td colspan="3">لا توجد سجلات تفصيلية متاح تتبعها لهذا الرابط.</td></tr>`;
-            }
-        } catch (err) {
-            tbody.innerHTML = `<tr><td colspan="3">خطأ في جلب بيانات الإحصائيات</td></tr>`;
-        }
+        document.getElementById('analytics-total-count').innerText = link.click_count || 0;
+        document.getElementById('analytics-last-access').innerText = link.last_accessed_at || 'لم يزار بعد';
 
         ModalManager.open('modal-analytics');
     }
