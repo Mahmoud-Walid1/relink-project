@@ -3,7 +3,7 @@ class RelinkApp {
         this.folders = [];
         this.links = [];
         this.currentFolderId = null;
-        this.selectedItem = null; // { type: 'folder'|'link', data: {} }
+        this.selectedItem = null;
 
         this.init();
     }
@@ -174,6 +174,10 @@ class RelinkApp {
             this.renderTree();
             this.renderContent();
         };
+        rootItem.oncontextmenu = (e) => {
+            e.preventDefault();
+            this.showBackgroundContextMenu(e);
+        };
         treeContainer.appendChild(rootItem);
 
         const rootFolders = this.folders.filter(f => !f.parent_id);
@@ -213,7 +217,8 @@ class RelinkApp {
 
         item.oncontextmenu = (e) => {
             e.preventDefault();
-            this.showContextMenu(e, { type: 'folder', data: folder });
+            e.stopPropagation();
+            this.showFolderContextMenu(e, folder);
         };
 
         node.appendChild(item);
@@ -233,6 +238,13 @@ class RelinkApp {
         const itemsList = document.getElementById('items-list');
         const statsBadge = document.getElementById('folder-stats-badge');
         if (!itemsList) return;
+
+        // Bind Windows-like background right click
+        itemsList.oncontextmenu = (e) => {
+            if (e.target.closest('.item-card') || e.target.closest('.btn')) return;
+            e.preventDefault();
+            this.showBackgroundContextMenu(e);
+        };
 
         // Render Breadcrumb
         breadcrumb.innerHTML = '';
@@ -268,7 +280,8 @@ class RelinkApp {
         if (currentSubFolders.length === 0 && currentLinks.length === 0) {
             itemsList.innerHTML = `<div class="empty-state text-center py-5">
                 <div style="font-size: 40px; margin-bottom: 10px;">📂</div>
-                <p style="color: var(--text-muted);">هذا المجلد فارغ حالياً. أنشئ مجلداً أو رابطاً جديداً للبدء.</p>
+                <p style="color: var(--text-muted);">هذا المجلد فارغ حالياً.</p>
+                <p style="color: var(--accent); font-size: 13px; margin-top: 6px;">💡 اضغط كليك يمين في أي مكان فارغ لإنشاء مجلد أو رابط جديد بسرعة!</p>
             </div>`;
             return;
         }
@@ -298,11 +311,12 @@ class RelinkApp {
             };
             card.oncontextmenu = (e) => {
                 e.preventDefault();
-                this.showContextMenu(e, { type: 'folder', data: folder });
+                e.stopPropagation();
+                this.showFolderContextMenu(e, folder);
             };
             card.querySelector('.card-actions-btn').onclick = (e) => {
                 e.stopPropagation();
-                this.showContextMenu(e, { type: 'folder', data: folder });
+                this.showFolderContextMenu(e, folder);
             };
             grid.appendChild(card);
         });
@@ -338,7 +352,8 @@ class RelinkApp {
             };
             card.oncontextmenu = (e) => {
                 e.preventDefault();
-                this.showContextMenu(e, { type: 'link', data: link });
+                e.stopPropagation();
+                this.showLinkContextMenu(e, link);
             };
             card.querySelector('.btn-copy-link').onclick = (e) => {
                 e.stopPropagation();
@@ -347,7 +362,7 @@ class RelinkApp {
             };
             card.querySelector('.card-actions-btn').onclick = (e) => {
                 e.stopPropagation();
-                this.showContextMenu(e, { type: 'link', data: link });
+                this.showLinkContextMenu(e, link);
             };
             grid.appendChild(card);
         });
@@ -356,37 +371,36 @@ class RelinkApp {
         itemsList.appendChild(grid);
     }
 
-    showContextMenu(e, item) {
-        this.selectedItem = item;
-        ContextMenu.show(e.clientX, e.clientY, {
-            onCopy: () => {
-                if (item.type === 'link') {
-                    const fullUrl = this.getFullLinkUrl(item.data);
-                    navigator.clipboard.writeText(fullUrl);
-                    ToastManager.show('تم نسخ الرابط الثابت بنجاح! 📋', 'success');
-                } else {
-                    ToastManager.show('زر النسخ متاح للروابط والدروس فقط', 'info');
-                }
-            },
-            onQr: () => {
-                if (item.type === 'link') {
-                    this.showQrModal(item.data);
-                } else {
-                    ToastManager.show('رمز الـ QR متاح للروابط والدروس فقط', 'info');
-                }
-            },
-            onEdit: () => {
-                if (item.type === 'folder') this.openFolderModal(item.data);
-                else this.openLinkModal(item.data);
-            },
-            onSettings: () => {
-                if (item.type === 'link') this.showAnalyticsModal(item.data);
-                else this.openFolderModal(item.data);
-            },
-            onDelete: () => {
-                this.deleteItem(item);
-            }
-        });
+    showBackgroundContextMenu(e) {
+        ContextMenu.show(e.clientX, e.clientY, [
+            { label: '📁 إنشاء مجلد جديد هنا', action: () => this.openFolderModal(null, this.currentFolderId) },
+            { label: '🔗 إنشاء رابط جديد هنا', action: () => this.openLinkModal(null, this.currentFolderId) },
+            'divider',
+            { label: '🔄 تحديث العرض', action: () => this.loadData() }
+        ]);
+    }
+
+    showFolderContextMenu(e, folder) {
+        ContextMenu.show(e.clientX, e.clientY, [
+            { label: '📂 فتح المجلد', action: () => { this.currentFolderId = folder.id; this.renderTree(); this.renderContent(); } },
+            { label: '📁 إنشاء مجلد فرعي داخل هذا المجلد', action: () => this.openFolderModal(null, folder.id) },
+            { label: '🔗 إنشاء رابط جديد داخل هذا المجلد', action: () => this.openLinkModal(null, folder.id) },
+            'divider',
+            { label: '✏️ تعديل اسم أو مسار المجلد', action: () => this.openFolderModal(folder) },
+            { label: '🗑️ حذف المجلد وكافة محتوياته', danger: true, action: () => this.deleteItem({ type: 'folder', data: folder }) }
+        ]);
+    }
+
+    showLinkContextMenu(e, link) {
+        const fullUrl = this.getFullLinkUrl(link);
+        ContextMenu.show(e.clientX, e.clientY, [
+            { label: '📋 نسخ الرابط الثابت', action: () => { navigator.clipboard.writeText(fullUrl); ToastManager.show('تم نسخ الرابط الثابت بنجاح! 📋', 'success'); } },
+            { label: '📱 توليد رمز QR Code', action: () => this.showQrModal(link) },
+            { label: '⚙️ إحصائيات وتفاصيل الرابط', action: () => this.showAnalyticsModal(link) },
+            'divider',
+            { label: '✏️ تعديل الرابط', action: () => this.openLinkModal(link) },
+            { label: '🗑️ حذف الرابط', danger: true, action: () => this.deleteItem({ type: 'link', data: link }) }
+        ]);
     }
 
     showQrModal(link) {
@@ -430,23 +444,23 @@ class RelinkApp {
         ModalManager.open('modal-analytics');
     }
 
-    openFolderModal(folder = null) {
+    openFolderModal(folder = null, defaultParentId = null) {
         document.getElementById('modal-folder-title').innerText = folder ? 'تعديل المجلد' : 'إنشاء مجلد جديد';
         document.getElementById('folder-id').value = folder ? folder.id : '';
         document.getElementById('folder-name').value = folder ? folder.name : '';
         document.getElementById('folder-slug').value = folder ? folder.slug : '';
-        document.getElementById('folder-parent-id').value = folder ? (folder.parent_id || '') : (this.currentFolderId || '');
+        document.getElementById('folder-parent-id').value = folder ? (folder.parent_id || '') : (defaultParentId !== null ? defaultParentId : (this.currentFolderId || ''));
 
         ModalManager.open('modal-folder');
     }
 
-    openLinkModal(link = null) {
+    openLinkModal(link = null, defaultFolderId = null) {
         document.getElementById('modal-link-title').innerText = link ? 'تعديل الرابط' : 'إنشاء رابط جديد';
         document.getElementById('link-id').value = link ? link.id : '';
         document.getElementById('link-title').value = link ? link.title : '';
         document.getElementById('link-target-url').value = link ? link.target_url : '';
         document.getElementById('link-slug').value = link ? link.slug : '';
-        document.getElementById('link-folder-id').value = link ? (link.folder_id || '') : (this.currentFolderId || '');
+        document.getElementById('link-folder-id').value = link ? (link.folder_id || '') : (defaultFolderId !== null ? defaultFolderId : (this.currentFolderId || ''));
         document.getElementById('link-is-active').checked = link ? (parseInt(link.is_active) === 1) : true;
         document.getElementById('link-track-analytics').checked = link ? (parseInt(link.track_analytics) === 1) : false;
 
@@ -471,9 +485,10 @@ class RelinkApp {
         const data = await res.json();
         if (data.success) {
             ModalManager.close('modal-folder');
+            ToastManager.show('تم حفظ المجلد بنجاح! 📁', 'success');
             await this.loadData();
         } else {
-            alert(data.error || 'حدث خطأ أثناء حفظ المجلد');
+            ToastManager.show(data.error || 'حدث خطأ أثناء حفظ المجلد', 'error');
         }
     }
 
@@ -498,9 +513,10 @@ class RelinkApp {
         const data = await res.json();
         if (data.success) {
             ModalManager.close('modal-link');
+            ToastManager.show('تم حفظ الرابط بنجاح! 🔗', 'success');
             await this.loadData();
         } else {
-            alert(data.error || 'حدث خطأ أثناء حفظ الرابط');
+            ToastManager.show(data.error || 'حدث خطأ أثناء حفظ الرابط', 'error');
         }
     }
 
@@ -511,9 +527,10 @@ class RelinkApp {
         const res = await fetch(url, { method: 'DELETE' });
         const data = await res.json();
         if (data.success) {
+            ToastManager.show('تم الحذف بنجاح! 🗑️', 'success');
             await this.loadData();
         } else {
-            alert(data.error || 'فشل عملية الحذف');
+            ToastManager.show(data.error || 'فشل عملية الحذف', 'error');
         }
     }
 

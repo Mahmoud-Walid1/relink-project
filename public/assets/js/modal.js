@@ -34,26 +34,45 @@ class ModalManager {
 class ContextMenu {
     static init() {
         const menu = document.getElementById('context-menu');
-        document.addEventListener('click', () => {
-            if (menu) menu.classList.remove('active');
+        document.addEventListener('click', (e) => {
+            if (menu && !menu.contains(e.target)) {
+                menu.classList.remove('active');
+            }
         });
     }
 
-    static show(x, y, onSelectCallbacks) {
+    static show(x, y, items) {
         const menu = document.getElementById('context-menu');
         if (!menu) return;
+
+        menu.innerHTML = '';
+        items.forEach(item => {
+            if (item === 'divider') {
+                const div = document.createElement('div');
+                div.className = 'menu-divider';
+                menu.appendChild(div);
+            } else {
+                const el = document.createElement('div');
+                el.className = `menu-item ${item.danger ? 'danger' : ''}`;
+                el.innerHTML = item.label;
+                el.onclick = (e) => {
+                    e.stopPropagation();
+                    menu.classList.remove('active');
+                    if (item.action) item.action();
+                };
+                menu.appendChild(el);
+            }
+        });
+
+        // Adjust position if near screen edge
+        const menuWidth = 220;
+        const menuHeight = menu.children.length * 36;
+        if (x + menuWidth > window.innerWidth) x = window.innerWidth - menuWidth - 10;
+        if (y + menuHeight > window.innerHeight) y = window.innerHeight - menuHeight - 10;
 
         menu.style.top = `${y}px`;
         menu.style.left = `${x}px`;
         menu.classList.add('active');
-
-        // Bind items
-        const btnCopy = document.getElementById('ctx-copy');
-        if (btnCopy) btnCopy.onclick = () => onSelectCallbacks.onCopy && onSelectCallbacks.onCopy();
-        document.getElementById('ctx-qr').onclick = () => onSelectCallbacks.onQr && onSelectCallbacks.onQr();
-        document.getElementById('ctx-edit').onclick = () => onSelectCallbacks.onEdit && onSelectCallbacks.onEdit();
-        document.getElementById('ctx-settings').onclick = () => onSelectCallbacks.onSettings && onSelectCallbacks.onSettings();
-        document.getElementById('ctx-delete').onclick = () => onSelectCallbacks.onDelete && onSelectCallbacks.onDelete();
     }
 }
 
