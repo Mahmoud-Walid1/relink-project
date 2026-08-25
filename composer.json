@@ -1,0 +1,8 @@
+{
+    "name": "relink/redirection-system",
+    "description": "Dynamic URL redirection system for educational content",
+    "type": "project",
+    "require": {
+        "php": ">=7.4"
+    }
+}

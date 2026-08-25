@@ -18,6 +18,13 @@ class Database {
                 self::$instance->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
                 self::$instance->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
                 self::$instance->exec('PRAGMA foreign_keys = ON;');
+
+                // Auto initialize schema if tables missing
+                $schemaFile = __DIR__ . '/../database/schema.sql';
+                if (file_exists($schemaFile)) {
+                    $schema = file_get_contents($schemaFile);
+                    self::$instance->exec($schema);
+                }
             } catch (PDOException $e) {
                 die("خطأ في الاتصال بقاعدة البيانات: " . $e->getMessage());
             }
