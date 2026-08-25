@@ -99,6 +99,7 @@ class AdminController {
 
                     <!-- Context Menu Overlay -->
                     <div id="context-menu" class="context-menu">
+                        <div class="menu-item" id="ctx-copy">📋 نسخ الرابط الثابت</div>
                         <div class="menu-item" id="ctx-qr">📱 توليد رمز QR Code</div>
                         <div class="menu-item" id="ctx-edit">✏️ تعديل</div>
                         <div class="menu-item" id="ctx-settings">⚙️ إعدادات وخيارات متقدمة</div>

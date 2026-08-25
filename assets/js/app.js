@@ -318,7 +318,10 @@ class RelinkApp {
             card.innerHTML = `
                 <div class="card-header">
                     <span class="card-type-icon">🔗</span>
-                    <button class="card-actions-btn">⋮</button>
+                    <div style="display: flex; gap: 6px; align-items: center;">
+                        <button class="btn btn-secondary btn-sm btn-copy-link" title="نسخ الرابط الثابت">📋 نسخ</button>
+                        <button class="card-actions-btn">⋮</button>
+                    </div>
                 </div>
                 <div class="card-title">${link.title}</div>
                 <div class="card-slug" title="${fullUrl}">${fullUrl.replace(window.location.origin, '')}</div>
@@ -337,6 +340,11 @@ class RelinkApp {
                 e.preventDefault();
                 this.showContextMenu(e, { type: 'link', data: link });
             };
+            card.querySelector('.btn-copy-link').onclick = (e) => {
+                e.stopPropagation();
+                navigator.clipboard.writeText(fullUrl);
+                alert('تم نسخ الرابط الثابت بنجاح:\n' + fullUrl);
+            };
             card.querySelector('.card-actions-btn').onclick = (e) => {
                 e.stopPropagation();
                 this.showContextMenu(e, { type: 'link', data: link });
@@ -351,6 +359,15 @@ class RelinkApp {
     showContextMenu(e, item) {
         this.selectedItem = item;
         ContextMenu.show(e.clientX, e.clientY, {
+            onCopy: () => {
+                if (item.type === 'link') {
+                    const fullUrl = this.getFullLinkUrl(item.data);
+                    navigator.clipboard.writeText(fullUrl);
+                    alert('تم نسخ الرابط الثابت بنجاح:\n' + fullUrl);
+                } else {
+                    alert('زر النسخ متاح للروابط والدروس فقط.');
+                }
+            },
             onQr: () => {
                 if (item.type === 'link') {
                     this.showQrModal(item.data);

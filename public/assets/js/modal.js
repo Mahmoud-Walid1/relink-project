@@ -48,6 +48,8 @@ class ContextMenu {
         menu.classList.add('active');
 
         // Bind items
+        const btnCopy = document.getElementById('ctx-copy');
+        if (btnCopy) btnCopy.onclick = () => onSelectCallbacks.onCopy && onSelectCallbacks.onCopy();
         document.getElementById('ctx-qr').onclick = () => onSelectCallbacks.onQr && onSelectCallbacks.onQr();
         document.getElementById('ctx-edit').onclick = () => onSelectCallbacks.onEdit && onSelectCallbacks.onEdit();
         document.getElementById('ctx-settings').onclick = () => onSelectCallbacks.onSettings && onSelectCallbacks.onSettings();
