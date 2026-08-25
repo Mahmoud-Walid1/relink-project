@@ -168,7 +168,7 @@ class RelinkApp {
         // Root Folder Item
         const rootItem = document.createElement('div');
         rootItem.className = `tree-item ${this.currentFolderId === null ? 'active' : ''}`;
-        rootItem.innerHTML = `<span>🏠</span> <strong>الرئيسية (الجذر)</strong>`;
+        rootItem.innerHTML = `<span>🏠</span> <strong>الرئيسية</strong>`;
         rootItem.onclick = () => {
             this.currentFolderId = null;
             this.renderTree();
@@ -203,6 +203,11 @@ class RelinkApp {
 
         const childrenContainer = document.createElement('div');
         childrenContainer.className = 'tree-children';
+        // Auto open if active or contains active folder
+        if (this.isFolderInPath(folder.id, this.currentFolderId)) {
+            childrenContainer.classList.add('open');
+            item.querySelector('.tree-toggler').innerText = '▼';
+        }
 
         item.onclick = (e) => {
             e.stopPropagation();
@@ -233,21 +238,53 @@ class RelinkApp {
         return node;
     }
 
+    isFolderInPath(folderId, targetFolderId) {
+        if (targetFolderId === null) return false;
+        let curr = this.folders.find(f => f.id == targetFolderId);
+        while (curr) {
+            if (curr.id == folderId) return true;
+            curr = curr.parent_id ? this.folders.find(f => f.id == curr.parent_id) : null;
+        }
+        return false;
+    }
+
     renderContent() {
         const breadcrumb = document.getElementById('breadcrumb-bar');
         const itemsList = document.getElementById('items-list');
         const statsBadge = document.getElementById('folder-stats-badge');
+        const mainContentSec = document.querySelector('.main-content');
         if (!itemsList) return;
 
-        // Bind Windows-like background right click
-        itemsList.oncontextmenu = (e) => {
-            if (e.target.closest('.item-card') || e.target.closest('.btn')) return;
-            e.preventDefault();
-            this.showBackgroundContextMenu(e);
-        };
+        // Bind Windows-like right click on entire main panel area
+        if (mainContentSec) {
+            mainContentSec.oncontextmenu = (e) => {
+                if (e.target.closest('.item-card') || e.target.closest('.btn') || e.target.closest('.breadcrumb-item')) return;
+                e.preventDefault();
+                this.showBackgroundContextMenu(e);
+            };
+        }
 
-        // Render Breadcrumb
+        // Render Breadcrumb & Back Button
         breadcrumb.innerHTML = '';
+
+        if (this.currentFolderId !== null) {
+            const currentFolder = this.folders.find(f => f.id == this.currentFolderId);
+            const parentId = currentFolder ? currentFolder.parent_id : null;
+
+            const backBtn = document.createElement('button');
+            backBtn.className = 'btn btn-secondary btn-sm';
+            backBtn.style.marginLeft = '12px';
+            backBtn.style.padding = '4px 10px';
+            backBtn.innerHTML = '⬅️ رجوع';
+            backBtn.title = 'الرجوع للمجلد السابق';
+            backBtn.onclick = () => {
+                this.currentFolderId = parentId ? parseInt(parentId) : null;
+                this.renderTree();
+                this.renderContent();
+            };
+            breadcrumb.appendChild(backBtn);
+        }
+
         const homeB = document.createElement('span');
         homeB.className = `breadcrumb-item ${this.currentFolderId === null ? 'active' : ''}`;
         homeB.innerText = 'الرئيسية';

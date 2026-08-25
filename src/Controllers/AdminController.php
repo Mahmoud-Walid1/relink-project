@@ -11,7 +11,7 @@ class AdminController {
         <head>
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Relink - لوحة التحكم الشجرية</title>
+            <title>Relink - لوحة التحكم</title>
             <link rel="stylesheet" href="assets/css/style.css">
             <link rel="preconnect" href="https://fonts.googleapis.com">
             <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -70,10 +70,10 @@ class AdminController {
 
                     <main class="dashboard-body container">
                         <div class="dashboard-grid">
-                            <!-- Left Sidebar: Tree View Navigation -->
+                            <!-- Left Sidebar: Folder Tree Navigation -->
                             <aside class="tree-sidebar glass-panel">
                                 <div class="sidebar-header">
-                                    <h3>الهيكل الشجري</h3>
+                                    <h3>قائمة المجلدات</h3>
                                     <button class="btn-icon" id="btn-expand-all" title="توسيع الكل">📂</button>
                                 </div>
                                 <div id="tree-container" class="tree-root">
@@ -124,9 +124,9 @@ class AdminController {
                                     <small class="help-text">يستخدم لبناء مسار الرابط النظيف</small>
                                 </div>
                                 <div class="form-group">
-                                    <label>المجلد الأب (الموقع الشجري)</label>
+                                    <label>المجلد الأب</label>
                                     <select id="folder-parent-id">
-                                        <option value="">[المستوى الرئيسي - الجذر]</option>
+                                        <option value="">[المستوى الرئيسي]</option>
                                     </select>
                                 </div>
                                 <div class="modal-actions">
