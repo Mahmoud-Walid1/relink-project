@@ -1,0 +1,6 @@
+# Ignore database runtime file
+/database/database.sqlite
+
+# Ignore OS files
+.DS_Store
+Thumbs.db
