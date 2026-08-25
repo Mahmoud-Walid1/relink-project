@@ -57,6 +57,30 @@ class ContextMenu {
     }
 }
 
+class ToastManager {
+    static show(message, type = 'success', duration = 3000) {
+        let container = document.querySelector('.toast-container');
+        if (!container) {
+            container = document.createElement('div');
+            container.className = 'toast-container';
+            document.body.appendChild(container);
+        }
+
+        const toast = document.createElement('div');
+        toast.className = `toast toast-${type}`;
+        
+        const icon = type === 'success' ? '✅' : (type === 'error' ? '⚠️' : 'ℹ️');
+        toast.innerHTML = `<span>${icon}</span> <span>${message}</span>`;
+        
+        container.appendChild(toast);
+
+        setTimeout(() => {
+            toast.classList.add('fade-out');
+            setTimeout(() => toast.remove(), 300);
+        }, duration);
+    }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     ModalManager.initCloseListeners();
     ContextMenu.init();

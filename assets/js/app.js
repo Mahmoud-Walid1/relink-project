@@ -56,7 +56,7 @@ class RelinkApp {
                 const input = document.getElementById('qr-full-url');
                 input.select();
                 navigator.clipboard.writeText(input.value);
-                alert('تم نسخ الرابط بنجاح');
+                ToastManager.show('تم نسخ الرابط الثابت بنجاح! 📋', 'success');
             });
         }
     }
@@ -343,7 +343,7 @@ class RelinkApp {
             card.querySelector('.btn-copy-link').onclick = (e) => {
                 e.stopPropagation();
                 navigator.clipboard.writeText(fullUrl);
-                alert('تم نسخ الرابط الثابت بنجاح:\n' + fullUrl);
+                ToastManager.show('تم نسخ الرابط الثابت بنجاح! 📋', 'success');
             };
             card.querySelector('.card-actions-btn').onclick = (e) => {
                 e.stopPropagation();
@@ -363,16 +363,16 @@ class RelinkApp {
                 if (item.type === 'link') {
                     const fullUrl = this.getFullLinkUrl(item.data);
                     navigator.clipboard.writeText(fullUrl);
-                    alert('تم نسخ الرابط الثابت بنجاح:\n' + fullUrl);
+                    ToastManager.show('تم نسخ الرابط الثابت بنجاح! 📋', 'success');
                 } else {
-                    alert('زر النسخ متاح للروابط والدروس فقط.');
+                    ToastManager.show('زر النسخ متاح للروابط والدروس فقط', 'info');
                 }
             },
             onQr: () => {
                 if (item.type === 'link') {
                     this.showQrModal(item.data);
                 } else {
-                    alert('رمز الـ QR متاح للروابط والدروس فقط.');
+                    ToastManager.show('رمز الـ QR متاح للروابط والدروس فقط', 'info');
                 }
             },
             onEdit: () => {
